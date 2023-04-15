@@ -9,10 +9,13 @@
 	<h1>To-Do List</h1>
 	<ul>
 	{% for task in tasks %}
-		<li>{{ task }}</li>
+	<span class="task-id">{{ loop.index }}</span>
+	<li>{{ task }}</li>
+	<form action="{{ url_for('delete_task', id=loop.index) }}" method="POST">
+            <button type="submit" class="delete-button">Delete</button>
+    </form>
 	{% endfor %}
 	
-	</ul>
 	<form action="/add_task" method="post">
 		<input type="text" name="task" placeholder="Add task">
 		<button type="submit">Add</button>
