@@ -1,32 +1,37 @@
-#!/usr/bin/env python
-import cgi
+from flask import Flask, render_template, request, redirect, flash, url_for
+from builtins import enumerate
 
-# Read the contents of the tasks.txt file
-with open('tasks.txt', 'r') as file:
-    tasks = file.read()
+app = Flask(__name__)
 
-# Split the contents of the file into an array of tasks
-task_list = tasks.split('\n')
+# Define the route for the home page
+@app.route('/')
+def home():
+    # Read the contents of the tasks.txt file
+    with open('tasks.txt', 'r') as file:
+        tasks = file.read()
 
-# Generate HTML to display the tasks
-html = '<ul>'
-for task in task_list:
-    html += '<li>' + cgi.escape(task) + '</li>'
-html += '</ul>'
+    # Split the contents of the file into an array of tasks
+    task_list = tasks.split('\n')
 
-# If the form has been submitted, append the new task to the file
-form = cgi.FieldStorage()
-if 'task' in form:
-    new_task = form['task'].value.strip()
-    if new_task:
+    # Render the HTML template with the task list
+    return render_template('home.html', tasks=task_list, enumerate=enumerate)
+
+# Define the route for adding a new task
+@app.route('/add_task', methods=['POST'])
+def add_task():
+    # Get the task from the form data
+    task = request.form['task']
+
+    # If the task is not empty, append it to the tasks.txt file
+    if task:
         with open('tasks.txt', 'a') as file:
-            file.write(new_task + '\n')
+            file.write(task + '\n')
 
-# Generate HTML for the task form
-html += '<form method="post">'
-html += '<input type="text" name="task">'
-html += '<button type="submit">Add</button>'
-html += '</form>'
+    # Redirect back to the home page
+    return redirect('/')
 
-print('Content-type: text/html\n')
-print(html)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
